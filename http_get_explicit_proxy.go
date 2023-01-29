@@ -12,7 +12,7 @@ import (
 // Go HTTP clients will not proxy localhost addresses (or their synonyms) by default, even if http_proxy is set.
 // To avoid triggering the case above, Go's http.Client can be configured with a http.transport,
 // which by default uses ProxyFromEnvironment for a custom proxy configuration,
-// without mucking with the machine's network configuration.
+// without mucking with the machine's network configuration(127.0.0.1 local.alias >> /etc/hosts).
 // go run debug_request_headers.go --addr localhost:8080
 // go run basic_forward_proxy.go
 // go run http_get_explicit_proxy.go --target http://localhost:8080/foo/bar
