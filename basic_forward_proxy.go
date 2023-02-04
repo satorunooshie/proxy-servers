@@ -23,18 +23,19 @@ var hopByHopHeaders = []string{
 // http_proxy=http://localhost:9999 curl http://example.com
 func main() {
 	log.SetFlags(log.LUTC | log.Lshortfile)
-	s := newForwardProxyServer()
+
+	addr := flag.String("addr", "127.0.0.1:9999", "proxy address")
+	flag.Parse()
+	s := newForwardProxyServer(*addr)
 	log.Println("Starting proxy server on", s.Addr)
 	if err := http.ListenAndServe(s.Addr, s.Handler); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 }
 
-func newForwardProxyServer() *http.Server {
-	addr := flag.String("addr", "127.0.0.1:9999", "proxy address")
-	flag.Parse()
+func newForwardProxyServer(addr string) *http.Server {
 	return &http.Server{
-		Addr:    *addr,
+		Addr:    addr,
 		Handler: &forwardProxy{},
 	}
 }

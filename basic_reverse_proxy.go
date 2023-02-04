@@ -12,7 +12,11 @@ import (
 func main() {
 	log.SetFlags(log.LUTC | log.Lshortfile)
 
-	s, err := basicReverseProxy()
+	fromAddr := flag.String("from", "127.0.0.1:9090", "proxy's listening address")
+	toAddr := flag.String("to", "127.0.0.1:7000", "the first address this proxy will forward to")
+	flag.Parse()
+
+	s, err := basicReverseProxy(*fromAddr, *toAddr)
 	if err != nil {
 		log.Println(err)
 		return
@@ -23,15 +27,12 @@ func main() {
 	}
 }
 
-func basicReverseProxy() (*http.Server, error) {
-	toAddr := flag.String("to", "127.0.0.1:7000", "the first address this proxy will forward to")
-	fromAddr := flag.String("from", "127.0.0.1:9090", "proxy's listening address")
-	flag.Parse()
-	toURL, err := parseToURL(*toAddr)
+func basicReverseProxy(from, to string) (*http.Server, error) {
+	toURL, err := parseToURL(to)
 	if err != nil {
 		return nil, err
 	}
-	return &http.Server{Addr: *fromAddr, Handler: httputil.NewSingleHostReverseProxy(toURL)}, nil
+	return &http.Server{Addr: from, Handler: httputil.NewSingleHostReverseProxy(toURL)}, nil
 }
 
 func parseToURL(s string) (*url.URL, error) {

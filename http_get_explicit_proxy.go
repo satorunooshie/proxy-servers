@@ -18,8 +18,9 @@ import (
 // go run http_get_explicit_proxy.go --target http://localhost:8080/foo/bar
 func main() {
 	log.SetFlags(log.LUTC | log.Lshortfile)
-	target := flag.String("target", "http://example.org", "URL to get")
+
 	proxy := flag.String("proxy", "http://localhost:9999", "proxy to use")
+	target := flag.String("target", "http://example.org", "URL to get")
 	flag.Parse()
 
 	proxyURL, err := url.Parse(*proxy)

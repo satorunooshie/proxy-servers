@@ -11,7 +11,10 @@ import (
 func main() {
 	log.SetFlags(log.LUTC | log.Lshortfile)
 
-	s, err := debugRequestHeaders()
+	addr := flag.String("addr", "127.0.0.1:7000", "listen address")
+	flag.Parse()
+
+	s, err := debugRequestHeaders(*addr)
 	if err != nil {
 		log.Println(err)
 		return
@@ -25,9 +28,7 @@ func main() {
 // debugRequestHeaders answers all paths successfully and dumps the request to logs.
 // TLS termination with an off-the-shelf reverse proxy.
 // ex) caddy reverse-proxy --from :9090 --to :7000.
-func debugRequestHeaders() (*http.Server, error) {
-	addr := flag.String("addr", "127.0.0.1:7000", "listen address")
-	flag.Parse()
+func debugRequestHeaders(addr string) (*http.Server, error) {
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
 			var b strings.Builder
@@ -41,5 +42,5 @@ func debugRequestHeaders() (*http.Server, error) {
 			fmt.Fprintf(w, "Hello %s\n", r.URL)
 		},
 	)
-	return &http.Server{Addr: *addr}, nil
+	return &http.Server{Addr: addr}, nil
 }

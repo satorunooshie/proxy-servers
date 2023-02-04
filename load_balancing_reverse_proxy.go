@@ -11,9 +11,13 @@ import (
 
 func main() {
 	log.SetFlags(log.LUTC | log.Lshortfile)
+
+	fromAddr := flag.String("from", "127.0.0.1:9091", "proxy's listening address")
+	toAddr1 := flag.String("to1", "127.0.0.1:7000", "the first address this proxy will forward to")
+	toAddr2 := flag.String("to2", "127.0.0.1:7001", "the second address this proxy will forward to")
 	flag.Parse()
 
-	s, err := loadBalancingReverseProxy()
+	s, err := loadBalancingReverseProxy(*fromAddr, *toAddr1, *toAddr2)
 	if err != nil {
 		log.Println(err)
 		return
@@ -24,22 +28,18 @@ func main() {
 	}
 }
 
-func loadBalancingReverseProxy() (*http.Server, error) {
-	toAddr1 := flag.String("to1", "127.0.0.1:7000", "the first address this proxy will forward to")
-	toAddr2 := flag.String("to2", "127.0.0.1:7001", "the second address this proxy will forward to")
-	fromAddr := flag.String("from", "127.0.0.1:9091", "proxy's listening address")
-	flag.Parse()
-	t1, err := parseToURL(*toAddr1)
+func loadBalancingReverseProxy(from, to1, to2 string) (*http.Server, error) {
+	t1, err := parseToURL(to1)
 	if err != nil {
 		return nil, err
 	}
-	t2, err := parseToURL(*toAddr2)
+	t2, err := parseToURL(to2)
 	if err != nil {
 		return nil, err
 	}
 	tNum := 1
 	return &http.Server{
-		Addr: *fromAddr,
+		Addr: from,
 		Handler: &httputil.ReverseProxy{
 			Director: func(r *http.Request) {
 				var target *url.URL
