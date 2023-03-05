@@ -8,6 +8,7 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"math/big"
@@ -15,10 +16,15 @@ import (
 	"time"
 )
 
-const (
-	certFileName = "cert.pem"
-	keyFileName  = "key.pem"
+var (
+	certFileName string
+	keyFileName  string
 )
+
+func init() {
+	flag.StringVar(&certFileName, "cert", "cert.pem", "certificate PEM file")
+	flag.StringVar(&keyFileName, "key", "key.pem", "key PEM file")
+}
 
 func main() {
 	if err := Generate(); err != nil {
